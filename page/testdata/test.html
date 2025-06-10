@@ -1,0 +1,1641 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>A comprehensive guide to file operations in Go - Honeybadger Developer Blog</title>
+<meta name="description" content="Dive into the world of file operations in Go and explore advanced concepts such as file manipulation, reading, writing, error handling, and more. It's time level up your Go skills." />
+<meta name="thumbnail" content="https://ondemand.bannerbear.com/signedurl/nZ52rq9EkQ6V3bp1Lj/image.jpg?modifications=W3sibmFtZSI6InRpdGxlIiwidGV4dCI6IkEgY29tcHJlaGVuc2l2ZSBndWlkZSB0byBmaWxlIG9wZXJhdGlvbnMgaW4gR28iLCJjb2xvciI6bnVsbCwiYmFja2dyb3VuZCI6bnVsbH0seyJuYW1lIjoiaGVhZHNob3QiLCJpbWFnZV91cmwiOiJodHRwczovL3d3dy1maWxlcy5ob25leWJhZGdlci5pby9hdXRob3JzL2FkZWJheW9hZGFtcy5wbmcifSx7Im5hbWUiOiJzdW1tYXJ5IiwidGV4dCI6IkRpdmUgaW50byB0aGUgd29ybGQgb2YgZmlsZSBvcGVyYXRpb25zIGluIEdvIGFuZCBleHBsb3JlIGFkdmFuY2VkIGNvbmNlcHRzIHN1Y2ggYXMgZmlsZSBtYW5pcHVsYXRpb24sIHJlYWRpbmcsIHdyaXRpbmcsIGVycm9yIGhhbmRsaW5nLCBhbmQgbW9yZS4gSXQncyB0aW1lIGxldmVsIHVwIHlvdXIgR28gc2tpbGxzLiIsImNvbG9yIjpudWxsLCJiYWNrZ3JvdW5kIjpudWxsfSx7Im5hbWUiOiJhdXRob3IiLCJ0ZXh0IjoiQnkgKkFkZWJheW8gQWRhbXMqIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9LHsibmFtZSI6InRhZ3MiLCJ0ZXh0IjoiI2dvIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9XQ&amp;s=d5907977f6a67714153893a1a0feffe2c9b0d24fed9fb9687906b1937c00879b" />
+<meta itemprop="name" content="A comprehensive guide to file operations in Go" />
+<meta itemprop="description" content="Dive into the world of file operations in Go and explore advanced concepts such as file manipulation, reading, writing, error handling, and more. It's time level up your Go skills." />
+<meta itemprop="image" content="https://ondemand.bannerbear.com/signedurl/nZ52rq9EkQ6V3bp1Lj/image.jpg?modifications=W3sibmFtZSI6InRpdGxlIiwidGV4dCI6IkEgY29tcHJlaGVuc2l2ZSBndWlkZSB0byBmaWxlIG9wZXJhdGlvbnMgaW4gR28iLCJjb2xvciI6bnVsbCwiYmFja2dyb3VuZCI6bnVsbH0seyJuYW1lIjoiaGVhZHNob3QiLCJpbWFnZV91cmwiOiJodHRwczovL3d3dy1maWxlcy5ob25leWJhZGdlci5pby9hdXRob3JzL2FkZWJheW9hZGFtcy5wbmcifSx7Im5hbWUiOiJzdW1tYXJ5IiwidGV4dCI6IkRpdmUgaW50byB0aGUgd29ybGQgb2YgZmlsZSBvcGVyYXRpb25zIGluIEdvIGFuZCBleHBsb3JlIGFkdmFuY2VkIGNvbmNlcHRzIHN1Y2ggYXMgZmlsZSBtYW5pcHVsYXRpb24sIHJlYWRpbmcsIHdyaXRpbmcsIGVycm9yIGhhbmRsaW5nLCBhbmQgbW9yZS4gSXQncyB0aW1lIGxldmVsIHVwIHlvdXIgR28gc2tpbGxzLiIsImNvbG9yIjpudWxsLCJiYWNrZ3JvdW5kIjpudWxsfSx7Im5hbWUiOiJhdXRob3IiLCJ0ZXh0IjoiQnkgKkFkZWJheW8gQWRhbXMqIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9LHsibmFtZSI6InRhZ3MiLCJ0ZXh0IjoiI2dvIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9XQ&amp;s=d5907977f6a67714153893a1a0feffe2c9b0d24fed9fb9687906b1937c00879b" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="Honeybadger Developer Blog" />
+<meta name="twitter:url" content="https://www.honeybadger.io/blog/comprehensive-guide-to-file-operations-in-go/" />
+<meta name="twitter:title" content="A comprehensive guide to file operations in Go" />
+<meta name="twitter:description" content="Dive into the world of file operations in Go and explore advanced concepts such as file manipulation, reading, writing, error handling, and more. It's time level up your Go skills." />
+<meta name="twitter:image" content="https://ondemand.bannerbear.com/signedurl/nZ52rq9EkQ6V3bp1Lj/image.jpg?modifications=W3sibmFtZSI6InRpdGxlIiwidGV4dCI6IkEgY29tcHJlaGVuc2l2ZSBndWlkZSB0byBmaWxlIG9wZXJhdGlvbnMgaW4gR28iLCJjb2xvciI6bnVsbCwiYmFja2dyb3VuZCI6bnVsbH0seyJuYW1lIjoiaGVhZHNob3QiLCJpbWFnZV91cmwiOiJodHRwczovL3d3dy1maWxlcy5ob25leWJhZGdlci5pby9hdXRob3JzL2FkZWJheW9hZGFtcy5wbmcifSx7Im5hbWUiOiJzdW1tYXJ5IiwidGV4dCI6IkRpdmUgaW50byB0aGUgd29ybGQgb2YgZmlsZSBvcGVyYXRpb25zIGluIEdvIGFuZCBleHBsb3JlIGFkdmFuY2VkIGNvbmNlcHRzIHN1Y2ggYXMgZmlsZSBtYW5pcHVsYXRpb24sIHJlYWRpbmcsIHdyaXRpbmcsIGVycm9yIGhhbmRsaW5nLCBhbmQgbW9yZS4gSXQncyB0aW1lIGxldmVsIHVwIHlvdXIgR28gc2tpbGxzLiIsImNvbG9yIjpudWxsLCJiYWNrZ3JvdW5kIjpudWxsfSx7Im5hbWUiOiJhdXRob3IiLCJ0ZXh0IjoiQnkgKkFkZWJheW8gQWRhbXMqIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9LHsibmFtZSI6InRhZ3MiLCJ0ZXh0IjoiI2dvIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9XQ&amp;s=d5907977f6a67714153893a1a0feffe2c9b0d24fed9fb9687906b1937c00879b" />
+<meta property="og:url" content="https://www.honeybadger.io/blog/comprehensive-guide-to-file-operations-in-go/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="A comprehensive guide to file operations in Go" />
+<meta property="og:image" content="https://ondemand.bannerbear.com/signedurl/nZ52rq9EkQ6V3bp1Lj/image.jpg?modifications=W3sibmFtZSI6InRpdGxlIiwidGV4dCI6IkEgY29tcHJlaGVuc2l2ZSBndWlkZSB0byBmaWxlIG9wZXJhdGlvbnMgaW4gR28iLCJjb2xvciI6bnVsbCwiYmFja2dyb3VuZCI6bnVsbH0seyJuYW1lIjoiaGVhZHNob3QiLCJpbWFnZV91cmwiOiJodHRwczovL3d3dy1maWxlcy5ob25leWJhZGdlci5pby9hdXRob3JzL2FkZWJheW9hZGFtcy5wbmcifSx7Im5hbWUiOiJzdW1tYXJ5IiwidGV4dCI6IkRpdmUgaW50byB0aGUgd29ybGQgb2YgZmlsZSBvcGVyYXRpb25zIGluIEdvIGFuZCBleHBsb3JlIGFkdmFuY2VkIGNvbmNlcHRzIHN1Y2ggYXMgZmlsZSBtYW5pcHVsYXRpb24sIHJlYWRpbmcsIHdyaXRpbmcsIGVycm9yIGhhbmRsaW5nLCBhbmQgbW9yZS4gSXQncyB0aW1lIGxldmVsIHVwIHlvdXIgR28gc2tpbGxzLiIsImNvbG9yIjpudWxsLCJiYWNrZ3JvdW5kIjpudWxsfSx7Im5hbWUiOiJhdXRob3IiLCJ0ZXh0IjoiQnkgKkFkZWJheW8gQWRhbXMqIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9LHsibmFtZSI6InRhZ3MiLCJ0ZXh0IjoiI2dvIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9XQ&amp;s=d5907977f6a67714153893a1a0feffe2c9b0d24fed9fb9687906b1937c00879b" />
+<meta property="og:description" content="Dive into the world of file operations in Go and explore advanced concepts such as file manipulation, reading, writing, error handling, and more. It's time level up your Go skills." />
+<meta property="og:site_name" content="Honeybadger Developer Blog" />
+<meta property="og:locale" content="en_US" />
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?1749260165">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?1749260165">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?1749260165">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?1749260165">
+    <link color="#EA5937" type="image/png" href="/favicon.svg?1749260165" rel="mask-icon">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="canonical" href="https://www.honeybadger.io/blog/comprehensive-guide-to-file-operations-in-go/">
+
+    <link rel="me" href="https://ruby.social/@honeybadger">
+    <link rel="me" href="https://honeybadger.social/@honeybadger">
+
+      <script type="application/ld+json">
+        {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.honeybadger.io/blog/comprehensive-guide-to-file-operations-in-go/"
+  },
+  "headline": "A comprehensive guide to file operations in Go",
+  "description": "Dive into the world of file operations in Go and explore advanced concepts such as file manipulation, reading, writing, error handling, and more. It's time level up your Go skills.",
+  "image": "https://ondemand.bannerbear.com/signedurl/nZ52rq9EkQ6V3bp1Lj/image.jpg?modifications=W3sibmFtZSI6InRpdGxlIiwidGV4dCI6IkEgY29tcHJlaGVuc2l2ZSBndWlkZSB0byBmaWxlIG9wZXJhdGlvbnMgaW4gR28iLCJjb2xvciI6bnVsbCwiYmFja2dyb3VuZCI6bnVsbH0seyJuYW1lIjoiaGVhZHNob3QiLCJpbWFnZV91cmwiOiJodHRwczovL3d3dy1maWxlcy5ob25leWJhZGdlci5pby9hdXRob3JzL2FkZWJheW9hZGFtcy5wbmcifSx7Im5hbWUiOiJzdW1tYXJ5IiwidGV4dCI6IkRpdmUgaW50byB0aGUgd29ybGQgb2YgZmlsZSBvcGVyYXRpb25zIGluIEdvIGFuZCBleHBsb3JlIGFkdmFuY2VkIGNvbmNlcHRzIHN1Y2ggYXMgZmlsZSBtYW5pcHVsYXRpb24sIHJlYWRpbmcsIHdyaXRpbmcsIGVycm9yIGhhbmRsaW5nLCBhbmQgbW9yZS4gSXQncyB0aW1lIGxldmVsIHVwIHlvdXIgR28gc2tpbGxzLiIsImNvbG9yIjpudWxsLCJiYWNrZ3JvdW5kIjpudWxsfSx7Im5hbWUiOiJhdXRob3IiLCJ0ZXh0IjoiQnkgKkFkZWJheW8gQWRhbXMqIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9LHsibmFtZSI6InRhZ3MiLCJ0ZXh0IjoiI2dvIiwiY29sb3IiOm51bGwsImJhY2tncm91bmQiOm51bGx9XQ&s=d5907977f6a67714153893a1a0feffe2c9b0d24fed9fb9687906b1937c00879b",
+  "author": {
+    "@type": "Person",
+    "name": "Adebayo Adams",
+    "url": "https://www.honeybadger.io/blog/authors/adebayoadams/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Honeybadger",
+    "url": "https://www.honeybadger.io/",
+    "logo": "https://honeybadger-static.s3.amazonaws.com/brand_assets/honeybadger_logo/honeybadger_logo.svg"
+  },
+  "datePublished": "2023-09-11T00:00:00Z",
+  "dateModified": "2023-09-11T00:00:00Z"
+}
+      </script>
+
+    <script src="/assets/critical-Dn3npXI6.js?1749260165"></script>
+
+
+    <link href="/assets/style-uXaqIjp6.css?1749260165" rel="stylesheet" />
+
+    <link rel="dns-prefetch" href="https://app.honeybadger.io/" />
+    <link rel="prefetch" href="/" />
+    <link rel="prefetch" href="/plans/" />
+
+    <link rel="preload" href="/images/bolt.svg?1749260165" as="image">
+
+    <link rel="alternate" type="application/atom+xml" href="/blog/feed.xml" title="Honeybadger Developer Blog">
+<link rel="alternate" type="application/atom+xml" href="/blog/go/feed.xml" title="Honeybadger Developer Blog (Go articles)">
+
+    <!-- BunnyCDN -->
+    <link rel="preconnect" href="https://www-files.honeybadger.io" />
+
+    <!-- Cloudinary -->
+    <link rel="preconnect" href="https://res.cloudinary.com" />
+
+    <!-- Font Awesome -->
+    <link rel="preconnect" href="https://kit.fontawesome.com" />
+    <link rel="preconnect" href="https://ka-p.fontawesome.com" />
+    <script src="https://kit.fontawesome.com/3bb56511d9.js" crossorigin="anonymous"></script>
+
+    <!-- Typekit -->
+    <link rel="preconnect" href="https://use.typekit.net" />
+    <link rel="preload" href="https://use.typekit.net/iwe5sif.js" as="script" />
+    <script>
+      (function(d) {
+        var config = {
+          kitId: 'iwe5sif',
+          scriptTimeout: 3000,
+          async: true
+        },
+        h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+      })(document);
+    </script>
+
+    <!-- Profitwell Retain -->
+    <script id="profitwell-js" data-pw-auth="2453108de24292a3a0298ede019855c3">
+      (function(i,s,o,g,r,a,m){i[o]=i[o]||function(){(i[o].q=i[o].q||[]).push(arguments)};
+      a=s.createElement(g);m=s.getElementsByTagName(g)[0];a.async=1;a.src=r+'?auth='+
+      s.getElementById(o+'-js').getAttribute('data-pw-auth');m.parentNode.insertBefore(a,m);
+      })(window,document,'profitwell','script','https://public.profitwell.com/js/profitwell.js');
+      profitwell('start', {});
+    </script>
+  </head>
+  <body class="blog blog_comprehensive-guide-to-file-operations-in-go blog_comprehensive-guide-to-file-operations-in-go_index">
+
+      <div class="bg-dark">
+    
+<nav id="mainNavbar" class="navbar navbar-expand-lg main-navbar" data-bs-theme="dark" data-controller="sticky-scroll">  <div class="main-navbar-container">
+    <a class="navbar-brand" href="/" aria-label="Honeybadger.io">
+      <svg class="honeybadger-logo" height="40" viewBox="0 0 190 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+        <style>
+          :root,
+          [data-bs-theme="light"] {
+            --hb-logo-bolt-fill: var(--bs-brand);
+            --hb-logo-bolt-fill-rule: nonzero;
+            --hb-logo-border-fill: var(--bs-brand);
+            --hb-logo-text-fill: var(--bs-brand);
+          }
+
+          [data-bs-theme="dark"] {
+            --hb-logo-bolt-fill: url(#_Linear1);
+            --hb-logo-text-fill: white;
+          }
+          #logoBolt {
+            fill: var(--hb-logo-bolt-fill);
+            fill-rule: var(--hb-logo-bolt-fill-rule);
+          }
+          #logoBorder {
+            fill: var(--hb-logo-border-fill);
+          }
+          #logoText {
+            fill: var(--hb-logo-text-fill);
+          }
+        </style>
+        <path id="logoText" d="M58.59,34.57L62.786,5.798L58.115,5.798L56.398,17.497L52.161,17.497L53.878,5.798L49.207,5.798L44.978,34.57L49.649,34.57L51.527,21.799L55.764,21.799L53.886,34.57L58.59,34.57ZM67.303,28.803C71.974,28.803 73.809,26.83 74.777,19.78C75.678,13.085 74.11,10.886 69.772,10.886C65.168,10.886 63.199,13.15 62.365,20.039C61.498,26.798 63.266,28.803 67.303,28.803ZM67.77,25.504C66.602,25.504 66.302,24.372 66.936,20.006C67.537,15.479 68.104,14.153 69.438,14.153C70.606,14.153 70.84,15.22 70.239,19.683C69.639,24.114 69.071,25.504 67.77,25.504ZM81.42,12.697C82.454,11.727 83.956,10.886 85.29,10.886C87.993,10.886 88.927,12.73 88.46,15.964L86.591,28.415L82.254,28.415L84.022,16.449C84.189,15.285 83.956,14.702 83.088,14.702C82.421,14.702 81.787,15.285 81.387,15.673L79.518,28.415L75.181,28.415L77.683,11.274L81.353,11.274L81.42,12.697ZM136.677,11.274L136.176,12.536C135.442,11.468 134.341,10.886 132.973,10.886C129.804,10.886 127.868,13.409 127.067,20.103C126.266,26.733 127.801,28.803 130.304,28.803C131.805,28.803 132.973,28.092 133.84,27.089L133.874,28.415L137.878,28.415L140.413,11.274L136.677,11.274ZM134.14,24.243C133.773,24.696 133.073,25.181 132.472,25.181C131.404,25.181 131.071,24.178 131.638,20.006C132.238,15.576 132.873,14.541 133.94,14.541C134.574,14.541 135.108,14.993 135.408,15.479L134.14,24.243ZM154.727,5.798L151.39,28.415L147.42,28.415L147.386,27.089C146.519,28.124 145.318,28.803 143.85,28.803C141.347,28.803 139.779,26.733 140.614,20.103C141.414,13.409 143.316,10.886 146.519,10.886C147.754,10.886 148.721,11.404 149.422,12.212L150.391,5.798L154.727,5.798ZM145.185,20.006C144.584,24.178 144.951,25.181 146.019,25.181C146.586,25.181 147.32,24.696 147.687,24.243L148.955,15.479C148.655,14.993 148.087,14.541 147.487,14.541C146.419,14.541 145.786,15.576 145.185,20.006ZM107.145,34.563L158.879,34.563C161.976,34.563 164.601,32.283 165.035,29.215L167.572,11.274L163.835,11.274L163.435,12.568C162.768,11.63 161.633,10.886 160.399,10.886C157.029,10.886 155.194,12.73 154.259,19.909C153.359,26.442 154.827,28.447 157.463,28.447C158.797,28.447 160.032,27.865 160.866,26.895L160.733,28.124C160.375,29.66 158.797,30.879 156.204,30.879L109.231,30.879C108.618,32.327 108.021,33.499 107.315,34.363C107.259,34.431 107.203,34.498 107.145,34.563ZM159.698,24.89C158.63,24.89 158.23,23.952 158.797,19.877C159.365,15.608 160.032,14.541 161.132,14.541C161.733,14.541 162.267,14.993 162.567,15.446L161.333,23.952C160.965,24.405 160.265,24.89 159.698,24.89ZM177.647,27.283C175.88,28.318 174.044,28.803 172.443,28.803C168.706,28.803 167.004,25.569 167.738,20.071C168.606,13.473 171.075,10.886 175.312,10.886C177.948,10.886 179.583,12.245 179.583,14.638C179.583,17.839 177.782,21.332 171.909,22.4C171.909,22.575 171.919,22.703 171.928,22.82C171.935,22.918 171.942,23.008 171.942,23.111C171.975,24.437 172.676,25.148 173.844,25.148C174.645,25.148 175.579,24.89 176.914,24.275L177.647,27.283ZM174.812,14.088C173.778,14.088 172.843,15.64 172.276,19.068C174.745,18.745 175.679,16.772 175.679,15.349C175.679,14.573 175.412,14.088 174.812,14.088ZM183.133,28.415L184.901,16.675C185.769,15.899 186.736,15.479 187.703,15.479C187.971,15.479 188.204,15.479 188.471,15.511L189.339,11.339C188.871,11.016 188.471,10.886 187.971,10.886C186.703,10.886 185.602,11.889 184.801,13.312L184.734,11.274L181.331,11.274L178.795,28.415L183.133,28.415ZM99.105,27.283C97.337,28.318 95.502,28.803 93.9,28.803C90.164,28.803 88.462,25.569 89.196,20.071C90.064,13.473 92.532,10.886 96.77,10.886C99.406,10.886 101.04,12.245 101.04,14.638C101.04,17.839 99.239,21.332 93.367,22.4C93.367,22.576 93.376,22.704 93.385,22.82C93.393,22.918 93.4,23.008 93.4,23.111C93.433,24.437 94.134,25.148 95.302,25.148C96.103,25.148 97.037,24.89 98.372,24.275L99.105,27.283ZM96.269,14.088C95.235,14.088 94.301,15.64 93.734,19.068C96.203,18.745 97.137,16.772 97.137,15.349C97.137,14.573 96.87,14.088 96.269,14.088ZM119.965,28.803C123.769,28.803 125.237,25.795 126.038,18.777C126.805,12.503 125.571,10.886 122.935,10.886C121.601,10.886 120.432,11.436 119.398,12.245L120.266,6.273L115.93,6.273L112.692,28.415L116.629,28.415L117.029,27.121C117.597,28.059 118.631,28.803 119.965,28.803ZM119.131,25.181C118.531,25.181 117.897,24.857 117.63,24.243L118.931,15.446C119.431,14.929 120.098,14.541 120.733,14.541C121.734,14.541 121.934,15.543 121.5,18.939C121.1,22.982 120.432,25.181 119.131,25.181ZM105.859,23.758L109.629,11.274L114.1,11.274L107.427,28.609C105.592,33.331 104.558,34.564 101.656,34.564L60.91,34.564L61.451,30.879L96.923,30.878L100.944,30.878C102.286,30.878 103.023,29.947 103.023,28.738L101.522,11.274L106.226,11.274L105.859,23.758Z"/>
+        <path id="logoBorder" d="M28.229,12.072L36.157,20L20,36.157L18.241,34.399L15.854,36.786L18.408,39.341C19.287,40.22 20.713,40.22 21.592,39.341L39.341,21.592C40.22,20.713 40.22,19.287 39.341,18.408L29.651,8.719L28.229,12.072ZM27.934,7.002L26.512,10.355L23.521,7.364L25.909,4.977L27.934,7.002ZM24.317,3.385L21.592,0.659C20.713,-0.22 19.287,-0.22 18.408,0.659L0.659,18.408C-0.22,19.287 -0.22,20.713 0.659,21.592L11.063,31.995L12.587,28.744L3.843,20L20,3.843L21.93,5.772L24.317,3.385ZM12.755,33.688L14.279,30.437L16.65,32.807L14.262,35.195L12.755,33.688Z"/>
+        <g>
+        <path id="logoBolt" d="M29.788,2.63C30.029,2.061 29.309,1.575 28.872,2.013L9.533,21.352L17.411,21.352L11.142,36.785C10.911,37.353 11.627,37.829 12.061,37.395L30.918,18.538L23.039,18.538L29.788,2.63Z"/>
+        </g>
+        <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(2.18719e-15,35.7195,-35.7195,2.18719e-15,20.2253,1.84375)"><stop offset="0" style="stop-color:white;stop-opacity:1"/><stop offset="0.46" style="stop-color:rgb(255,204,0);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(255,113,67);stop-opacity:1"/></linearGradient>
+        </defs>
+      </svg>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse mt-4 mt-lg-0" id="navbarSupportedContent">
+      <ul class="navbar-nav navbar-nav-scroll me-auto gap-3">
+        <li class="nav-item dropdown hover-dropdown">
+          <a class="nav-link dropdown-toggle " href="#" id="tourDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Tour
+          </a>
+          <div class="dropdown-menu dropdown tour-dropdown" aria-labelledby="tourDropdown">
+            <div class="container px-4 py-2">
+              <div class="row">
+                <div class="col-lg-4 col-12">
+                  <strong>Features</strong>
+                  <a class="dropdown-item " href="/tour/error-tracking/">Error Tracking</a>
+                  <a class="dropdown-item " href="/tour/uptime-monitoring/">Uptime Monitoring</a>
+                  <a class="dropdown-item " href="/tour/status-pages/">Status Pages</a>
+                  <a class="dropdown-item " href="/tour/logging-observability/">Logging &amp; Observability</a>
+                  <a class="dropdown-item " href="/tour/cron-job-heartbeat-monitoring/">Cron &amp; Heartbeat Monitoring</a>
+                </div>
+
+                <div class="col-lg-3 col-12">
+                  <strong>Frameworks</strong>
+                  <div class="row">
+                    <div class="col-12">
+                      <a class="dropdown-item " href="/for/rails/">Ruby on Rails</a>
+                      <a class="dropdown-item " href="/for/laravel/">Laravel</a>
+                      <a class="dropdown-item " href="/for/django/">Django</a>
+                      <a class="dropdown-item " href="/for/phoenix/">Phoenix</a>
+                      <a class="dropdown-item " href="/for/dotnet/">.NET/C#</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5 col-12">
+                  <strong>Languages</strong>
+                  <div class="row">
+                    <div class="col-lg-6 col-12">
+                      <a class="dropdown-item " href="/for/ruby/">Ruby</a>
+                      <a class="dropdown-item " href="/for/php/">PHP</a>
+                      <a class="dropdown-item " href="/for/elixir/">Elixir</a>
+                      <a class="dropdown-item " href="/for/python/">Python</a>
+                      <a class="dropdown-item " href="/for/javascript/">JavaScript</a>
+                    </div>
+                    <div class="col-lg-6 col-12">
+                      <a class="dropdown-item " href="/for/crystal/">Crystal</a>
+                      <a class="dropdown-item " href="/for/node/">Node</a>
+                      <a class="dropdown-item " href="/for/go/">Go <span class="visually-hidden">programming language</span></a>
+                      <a class="dropdown-item " href="/for/java/">Java</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/plans/">Pricing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/blog/">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://docs.honeybadger.io/">Docs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://status.honeybadger.io">Status</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/contact/">Contact</a>
+        </li>
+        <li class="nav-item d-lg-none d-xl-block" style="font-style:italic;">
+          <a class="nav-link " href="/about/">Meet the 'Badgers</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav d-flex my-3 my-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="https://app.honeybadger.io/users/sign_in">Log In</a>
+        </li>
+      </ul>
+        <a class="btn btn-brand btn-brand-gradient border-light border-opacity-50 fw-medium cta-nav mt-2 ms-lg-2 mt-lg-0" href="https://app.honeybadger.io/users/sign_up?plan=team" onclick="window.fathom.trackGoal('YDVASYAU', 2600);">Start free trial</a>
+    </div>
+  </div>
+</nav>
+
+    <div style="background-color: var(--bs-body-bg);">
+        <div class="hb-bg-hero-badger rmb-5 rpt-1" data-bs-theme="dark">
+    <nav class="navbar navbar-expand" data-bs-theme="dark">
+  <div class="container-xxl" style="padding-right:15px;padding-left:15px;">
+    <ul class="navbar-nav me-auto">
+
+      <li class="nav-item">
+        <a class="nav-link" href="/blog/" title="Blog Home"><i class="fas fa-home" aria-hidden="true"></i><span class="a11y-text">Blog Home</span></a>
+      </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/company/" class="nav-link">Honeybadger</a>
+        </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/ruby/" class="nav-link">Ruby</a>
+        </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/php/" class="nav-link">PHP</a>
+        </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/javascript/" class="nav-link">JavaScript</a>
+        </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/python/" class="nav-link">Python</a>
+        </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/devops/" class="nav-link">DevOps</a>
+        </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/go/" class="nav-link active" aria-current="true">Go</a>
+        </li>
+        <li class="nav-item hidden-sm-down">
+          <a href="/blog/elixir/" class="nav-link">Elixir</a>
+        </li>
+      <li class="nav-item hidden-md-up">
+        <div class="dropdown">
+          <a href="#" class="btn btn-outline-secondary rounded-1 ms-3 py-1 px-2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="All Tags">
+            <span>Posts by topic</span>
+            <i class="fas fa-caret-down" aria-hidden="true"></i>
+          </a>
+          <div class="dropdown-menu c-tags-dropdown" aria-labelledby="dropdownMenuButton">
+              <a href="/blog/company/" class="dropdown-item">Honeybadger</a>
+              <a href="/blog/devops/" class="dropdown-item">DevOps</a>
+              <a href="/blog/elixir/" class="dropdown-item">Elixir</a>
+              <a href="/blog/go/" class="dropdown-item active" aria-current="true">Go</a>
+              <a href="/blog/javascript/" class="dropdown-item">JavaScript</a>
+              <a href="/blog/php/" class="dropdown-item">PHP</a>
+              <a href="/blog/python/" class="dropdown-item">Python</a>
+              <a href="/blog/ruby/" class="dropdown-item">Ruby</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <ul class="navbar-nav ms-auto right-navbar">
+      <li class="nav-item">
+        <a class="nav-link link-secondary" href="/blog/write-for-us/">Write for us</a>
+      </li>
+      <li class="nav-item">
+        <a title="RSS feed" class="nav-link link-secondary" href="/blog/feed.xml"><i class="fas fa-rss" aria-hidden="true"><span class="a11y-text">RSS feed</span></i></a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+          <div class="container-xl mt-md-2 py-2 py-md-4 text-body">
+      <div class="row justify-content-center">
+        <div class="col-lg-10 col-xxl-9">
+          <h1 class="display-1 mb-3 text-body-emphasis" data-lines="3">A comprehensive guide to file operations in Go</h1>
+          <ul class="list-inline">
+              <li class="list-inline-item ms-n2">
+                  <img src="https://www-files.honeybadger.io/authors/adebayoadams.png?width=76" class="avatar-small" width="46" height="46" alt="A photo of Adebayo Adams">
+                By <a href="/blog/authors/adebayoadams/" class="link-underline link-underline-opacity-0">Adebayo Adams</a>
+              </li>
+            <li class="list-inline-item text-info ms-n1">
+              on
+              Sep 11, 2023
+            </li>
+          </ul>
+        </div>
+        <div class="col-lg-2 d-none d-lg-block">&nbsp;</div>
+      </div>
+    </div>
+
+  </div>
+
+  
+
+  <div class="container-xl rmb-5">
+    <div class="row justify-content-center g-lg-5 g-xxl-6">
+      <div class="col-lg-8 col-xxl-7">
+
+        <div class="c-blog-post">
+          <article>
+            <p>Proper file management systems date to the <a href="https://domaonline.com/2021/12/07/the-history-of-document-management-1/">1800s</a>, and it is safe to say that the internet and even computers would not be able to work properly if they could not store, read, write, and delete files. In this article, you will learn everything you need to know about file operations in Go, from writing, reading, and creating files to creating and deleting directories in Go applications.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>The primary prerequisite to follow along with this article is a basic understanding of Go. You can check out my <a href="https://dev.to/olodocoder/series/22330">Go Beginners Series</a> to get more familiar with it or for a quick brush-up on your Go skills.</p>
+
+<h2 id="file-operations-in-go">File operations in Go</h2>
+
+<p>Go&#39;s file handling is quite straightforward due to its built-in package <code>os</code>; it provides access to most of the operating system&#39;s features, including the file system. It allows you to perform file operations without needing to change the code for it to work with different operating systems.</p>
+
+<p>The packages enable you to perform various file operations in your applications, from writing, reading, and creating files to creating and deleting directories. It also provides helpful error messages whenever it encounters errors while performing file operations.</p>
+
+<p>We’ll explore how to read files in Go in the next section.</p>
+
+<h2 id="reading-files-in-go">Reading files in Go</h2>
+
+<p>Reading files is probably the most frequent file operation you&#39;ll perform in Go, as many use cases require it. In this section, we will explore how to read different types of files in Go.</p>
+
+<p>Let&#39;s start with plain text files.</p>
+
+<h3 id="reading-txt-files-in-go">Reading <code>.txt</code> files in Go</h3>
+
+<p>The <code>os</code> package provides a <code>ReadFile</code> function that makes reading files straightforward in Go. For example, I have a data.txt file in my project folder, and I can read and print it out with the following code:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">filepath</span> <span class="o">:=</span> <span class="s">"data.txt"</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"File reading error"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="kt">string</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above defines a <code>filepath</code> variable with a string value of the file that I&#39;m trying to read, <code>data.txt</code>. It then reads the file with the <code>ReadFile</code> function and stores the result and error in the <code>data</code> and <code>err</code> variables. Finally, it checks for errors before printing the result in string format by wrapping it with the <code>string</code> helper function. It should return the following output in the terminal:</p>
+<div class="highlight"><pre class="highlight shell"><code>1. <span class="nb">fmt
+</span>2. net/http
+3. os
+4. io
+5. <span class="nb">time
+</span>6. encoding/json
+7. strings
+8. strconv
+9. <span class="nb">sync
+</span>10. testing
+11. database/sql
+12. encoding/csv
+13. regexp
+14. math
+15. bufio
+16. flag
+17. path/filepath
+18. image
+19. html/template
+20. crypto
+</code></pre></div>
+<p>And that&#39;s it! You&#39;ve just read your first file in Go! Let&#39;s explore how to read a file line-by-line in the next section.</p>
+
+<h3 id="reading-a-log-file-line-by-line-in-go">Reading a <code>log</code> file line-by-line in Go</h3>
+
+<p>In this section, we will explore a real-life use case of reading files in Go. Let&#39;s imagine that you&#39;re building an application that helps users deploy Go applications. You need to have a way for users to see the deployment errors so that they have an idea of what to fix before trying to re-deploy their application.</p>
+
+<p>We will write a code that reads a log file line-by-line and prints only the amount of lines requested by the user. This way, users can choose to see only the last five logs and don&#39;t have to scroll through all the logs to find the issue with their deployment.</p>
+
+<p>I have a sample <code>log.txt</code> file that looks like this:</p>
+<div class="highlight"><pre class="highlight plaintext"><code>2023-07-11 10:00:00 - Successful: operation completed.
+2023-07-11 10:05:12 - Error: Failed to connect to the database.
+2023-07-11 10:10:32 - Successful: data retrieval from API.
+2023-07-11 10:15:45 - Error: Invalid input received.
+2023-07-11 10:20:58 - Successful: file upload.
+2023-07-11 10:25:01 - Error: Authorization failed.
+2023-07-11 10:30:22 - Successful: record update.
+2023-07-11 10:35:37 - Error: Internal server error.
+2023-07-11 12:45:59 - Error: Server overloaded.
+2023-07-11 12:50:06 - Successful: session created.
+2023-07-11 12:55:17 - Error: Invalid input parameters.
+2023-07-11 13:00:30 - Successful: software update installed.
+2023-07-11 13:05:46 - Error: Access denied.
+2023-07-11 13:10:53 - Successful: report generated.
+2023-07-11 13:16:01 - Error: Unexpected exception occurred.
+2023-07-11 13:20:13 - Successful: user registration.
+2023-07-11 13:25:28 - Error: Disk read/write failure.
+</code></pre></div>
+<p>The code for doing this will look like this:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"bufio"</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">printLastNLines</span><span class="p">(</span><span class="n">lines</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="n">num</span> <span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">printLastNLines</span> <span class="p">[]</span><span class="kt">string</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="n">num</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+        <span class="n">printLastNLines</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">printLastNLines</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">printLastNLines</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">filepath</span> <span class="o">:=</span> <span class="s">"log.txt"</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Error opening file:"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="k">var</span> <span class="n">lines</span> <span class="p">[]</span><span class="kt">string</span>
+    <span class="n">scanner</span> <span class="o">:=</span> <span class="n">bufio</span><span class="o">.</span><span class="n">NewScanner</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">scanner</span><span class="o">.</span><span class="n">Scan</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">scanner</span><span class="o">.</span><span class="n">Text</span><span class="p">())</span>
+
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">scanner</span><span class="o">.</span><span class="n">Err</span><span class="p">();</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Error reading file:"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="c">// print the last 10 lines of the file</span>
+    <span class="n">printLastNLines</span> <span class="o">:=</span> <span class="n">printLastNLines</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">line</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">printLastNLines</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"________"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above uses the <code>os</code>&#39; package <code>Open</code> function to open the file, defers its <code>Close</code> function with the <code>defer</code> keyword, defines an empty <code>lines</code> slice, and uses the <code>bufio</code>&#39;s <code>NewScanner</code> function to read the file line-by-line while appending each line to the <code>lines</code> array in a text format using the <code>Text</code> function. Finally, it uses the <code>printLastNLines</code> function to get the last <code>N</code> lines of the <code>lines</code> array. <code>N</code> is any number of the user&#39;s choosing. In this case, it is 3, and the code uses a <code>for</code> loop to print each line with an horizontal line between each one.</p>
+
+<blockquote>
+<p>Note: The <code>defer</code> keyword ensures that the file closes if there is an error; if not, it closes the file after the function has finished running.</p>
+</blockquote>
+
+<p>Using the sample <code>log.txt</code> file, the code above should return the following:</p>
+<div class="highlight"><pre class="highlight shell"><code>2023-07-11 13:16:01 - Error: Unexpected exception occurred.
+________
+2023-07-11 13:20:13 - Successful: user registration.
+________
+2023-07-11 13:25:28 - Error: Disk <span class="nb">read</span>/write failure.
+________
+</code></pre></div>
+<p>Next, let&#39;s explore how to read <code>.json</code> files in Go.</p>
+
+<h3 id="reading-json-files-in-go">Reading <code>.json</code> files in Go</h3>
+
+<p>Reading and using data from <code>.json</code> files is also a popular use case in programming, so let&#39;s learn how to do that. For example, you have a <code>.json</code> configuration file that looks like the following:</p>
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="w">
+
+      </span><span class="nl">"database_host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"localhost"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"database_port"</span><span class="p">:</span><span class="w"> </span><span class="mi">5432</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"database_username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"myuser"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"database_password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mypassword"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"server_port"</span><span class="p">:</span><span class="w"> </span><span class="mi">8080</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"server_debug"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"server_timeout"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="w">
+
+  </span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>You also need to read for your application to work correctly, which can be done by reading and decoding the <code>.json</code> file:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"encoding/json"</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">type</span> <span class="n">Config</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">DBHost</span>        <span class="kt">string</span> <span class="s">`json:"database_host"`</span>
+    <span class="n">DBPort</span>        <span class="kt">int</span>    <span class="s">`json:"database_port"`</span>
+    <span class="n">DBUsername</span>    <span class="kt">string</span> <span class="s">`json:"database_username"`</span>
+    <span class="n">DBPassword</span>    <span class="kt">string</span> <span class="s">`json:"database_password"`</span>
+    <span class="n">ServerPort</span>    <span class="kt">int</span>    <span class="s">`json:"server_port"`</span>
+    <span class="n">ServerDebug</span>   <span class="kt">bool</span>   <span class="s">`json:"server_debug"`</span>
+    <span class="n">ServerTimeout</span> <span class="kt">int</span>    <span class="s">`json:"server_timeout"`</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">filepath</span> <span class="o">:=</span> <span class="s">"config.json"</span>
+    <span class="k">var</span> <span class="n">config</span> <span class="n">Config</span>
+
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">decoder</span> <span class="o">:=</span> <span class="n">json</span><span class="o">.</span><span class="n">NewDecoder</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">Decode</span><span class="p">(</span><span class="o">&amp;</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above uses the <code>os</code>&#39; package <code>Open</code> function to open the file, defers its <code>Close</code> function with the <code>defer</code> keyword, and uses the <code>json</code>&#39;s <code>NewDecoder</code> function to read the file. It then uses the <code>Decoder</code> function to decode it into an object and checks for errors before printing the <code>config</code> details in the terminal:</p>
+<div class="highlight"><pre class="highlight shell"><code><span class="o">{</span>localhost 5432 myuser mypassword 8080 <span class="nb">true </span>30<span class="o">}</span>
+</code></pre></div>
+<p>That&#39;s it! You can now split the <code>config</code> object up and use it however you like in your application.</p>
+
+<p>Next, let&#39;s look at how to read a <code>.csv</code> file.</p>
+
+<h3 id="reading-csv-files-in-go">Reading <code>.csv</code> files in Go</h3>
+
+<p>Comma-separated values (CSV) is one of the most popular file formats. Let&#39;s explore how to read the following <code>.csv</code> file in this section:</p>
+<div class="highlight"><pre class="highlight plaintext"><code>Name,Email,Phone,Address
+John Doe,johndoe@example.com,555-1234,123 Main St
+Jane Smith,janesmith@example.com,555-5678,456 Elm St
+Bob Johnson,bobjohnson@example.com,555-9876,789 Oak St
+</code></pre></div>
+<p>Go provides an <code>encoding/csv</code> package that can be used to read <code>.csv</code> files:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"encoding/csv"</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">filepath</span> <span class="o">:=</span> <span class="s">"data.csv"</span>
+
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">reader</span> <span class="o">:=</span> <span class="n">csv</span><span class="o">.</span><span class="n">NewReader</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">records</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">reader</span><span class="o">.</span><span class="n">ReadAll</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above uses the <code>os</code>&#39; package <code>Open</code> function to open the file, defer its <code>Close</code> function with the <code>defer</code> keyword, and create a <code>reader</code> variable that stores the result of the <code>NewReader</code> function. It then uses the <code>ReadAll</code> function to read the file, check for errors, and print the result in the terminal. The output should look like this:</p>
+<div class="highlight"><pre class="highlight shell"><code><span class="o">[[</span>Name Email Phone Address] <span class="o">[</span>John Doe johndoe@example.com 555-1234 123 Main St] <span class="o">[</span>Jane Smith janesmith@example.com 555-5678 456 Elm St] <span class="o">[</span>Bob Johnson bobjohnson@example.com 555-9876 789 Oak St]]
+</code></pre></div>
+<p>Let&#39;s explore how to read bytes from files in the next section.</p>
+
+<h3 id="reading-bytes-from-files-in-go">Reading bytes from files in Go</h3>
+
+<p>In some cases, you might want to read a specific number of bytes from files in Go:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">filepath</span> <span class="o">:=</span> <span class="s">"data.txt"</span>
+
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="kt">string</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above uses the <code>os</code>&#39; package <code>Open</code> function to open the file, defer its <code>Close</code> function with the <code>defer</code> keyword, and create a <code>data</code> variable that has the value of 10 bytes using the <code>make</code> function. It then checks for errors before printing the <code>data</code> out in bytes and string formats:</p>
+<div class="highlight"><pre class="highlight shell"><code><span class="o">[</span>49 46 32 102 109 116 10 50 46 32]
+1. <span class="nb">fmt
+</span>2. 
+</code></pre></div>
+<p>Now that we&#39;ve explored how to perform various read operations on different file formats in Go, let&#39;s explore how to handle write operations.</p>
+
+<h2 id="writing-and-manipulating-files-in-go">Writing and manipulating files in Go</h2>
+
+<p>Reading and writing files is relatively straightforward in Go, as it provides developers with a lot of functions to perform such tasks without needing to download a third-party library. In this section, we will explore different Go writing tasks and how to handle them properly.</p>
+
+<h3 id="creating-a-file-in-go">Creating a file in Go</h3>
+
+<p>Go&#39;s <code>os</code> package provides a <code>Create</code> function that creates files with any extension. For example, suppose you have an application that helps users to deploy applications. In this case, you might want to create an empty <code>log.txt</code> file containing the logs of the application immediately after the user creates a new project:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">"log.txt"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">"File created successfully"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above uses the <code>os</code>&#39;s <code>Create</code> function to create an empty <code>log.txt</code> file, checks for any error, and prints a success message to the user. The user should see the following output in the terminal:</p>
+<div class="highlight"><pre class="highlight shell"><code>File created successfully
+</code></pre></div>
+<p>Before continuing with writing files in Go, let&#39;s explore the different file opening flags in Go, as we will use some of them in the later in the article.</p>
+
+<h3 id="file-opening-flags-in-go">File-opening flags in Go</h3>
+
+<p>Go provides file-opening flags represented by constants defined in the <code>os</code> package. These flags determine the behavior of file operations, such as opening, creating, and truncating files. The following is a list of the flags and what they do.</p>
+
+<ol>
+<li><p><code>os.O_RDONLY</code>: Opens the file as read-only. The file must exist.</p></li>
+<li><p><code>os.O_WRONLY</code>: Opens the file as write-only. If the file exists, its contents are truncated. If it doesn&#39;t exist, a new file is created.</p></li>
+<li><p><code>os.O_RDWR</code>: Opens the file for reading and writing. If the file exists, its contents are truncated. If it doesn&#39;t exist, a new file is created.</p></li>
+<li><p><code>os.O_APPEND</code>: Appends data to the file when writing. Writes occur at the end of the file.</p></li>
+<li><p><code>os.O_CREATE</code>: Creates a new file if it doesn&#39;t exist.</p></li>
+<li><p><code>os.O_EXCL</code>: Used with <code>O_CREATE</code>, it ensures that the file is created exclusively, preventing creation if it already exists.</p></li>
+<li><p><code>os.O_SYNC</code>: Open the file for synchronous I/O operations. Write operations are completed before the call returns.</p></li>
+<li><p><code>os.O_TRUNC</code>: If the file exists and is successfully opened, its contents are truncated to zero length.</p></li>
+<li><p><code>os.O_NONBLOCK</code>: Opens the file in non-blocking mode. Operations like read or write may return immediately with an error if no data is available or the operation would block.</p></li>
+</ol>
+
+<p>These flags can be combined using the bitwise OR (<code>|</code>) operator. For example, <code>os.O_WRONLY|os.O_CREATE</code> would open the file for writing, creating it if it doesn&#39;t exist.</p>
+
+<p>When using these flags, it&#39;s important to check for errors returned by file operations to handle cases where the file cannot be opened or created as expected.</p>
+
+<p>Let&#39;s look at how to write text to files in the next section.</p>
+
+<h3 id="writing-text-to-files-in-go">Writing text to files in Go</h3>
+
+<p>The <code>os</code> package also provides a <code>WriteString</code> function that helps you write strings to files. For example, you want to update the <code>log.txt</code> file with a log message:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">OpenFile</span><span class="p">(</span><span class="s">"log.txt"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_CREATE</span><span class="p">,</span> <span class="m">0644</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">:=</span> <span class="s">"2023-07-11 10:05:12 - Error: Failed to connect to the database. _________________"</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">WriteString</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>The code above uses the <code>OpenFile</code> function to open the <code>log.txt</code> file in write-only mode and creates it if it doesn&#39;t exist. It then creates a <code>data</code> variable containing a string and uses the <code>WriteString</code> function to write string data to the file.</p>
+
+<h3 id="appending-to-a-file-in-go">Appending to a file in Go</h3>
+
+<p>The code in the previous section deletes the data inside the file before writing the new data every time the code is run, which is acceptable in some cases. However, for a log file, you want it to retain all the previous logs so that the user can refer to them as many times as needed to, for example, perform analytics.</p>
+
+<p>You can open a file in append mode like this:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">OpenFile</span><span class="p">(</span><span class="s">"log.txt"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_CREATE</span><span class="p">,</span> <span class="m">0644</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">:=</span> <span class="s">"</span><span class="se">\n</span><span class="s"> 2023-07-11 10:05:12 - Error: Failed to connect to the database.</span><span class="se">\n</span><span class="s"> __________________ </span><span class="se">\n</span><span class="s">"</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">WriteString</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>The code above uses the <code>os.O_APPEND</code> to open the file in append mode and will retain all the existing data before adding new data to the <code>log.txt</code> file. You should get an updated file each time you run the code instead of a new file.</p>
+
+<h3 id="writing-bytes-to-files-in-go">Writing bytes to files in Go</h3>
+
+<p>Go allows you to write bytes to files as strings with the <code>Write</code> function. For example, if you are streaming data from a server and it is returning bytes, you can write the bytes to a file to be readable:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">OpenFile</span><span class="p">(</span><span class="s">"data.bin"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_CREATE</span><span class="p">,</span> <span class="m">0644</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">{</span><span class="m">0x48</span><span class="p">,</span> <span class="m">0x65</span><span class="p">,</span> <span class="m">0x6C</span><span class="p">,</span> <span class="m">0x6C</span><span class="p">,</span> <span class="m">0x6F</span><span class="p">,</span> <span class="m">0x2C</span><span class="p">,</span> <span class="m">0x20</span><span class="p">,</span> <span class="m">0x57</span><span class="p">,</span> <span class="m">0x6F</span><span class="p">,</span> <span class="m">0x72</span><span class="p">,</span> <span class="m">0x6C</span><span class="p">,</span> <span class="m">0x64</span><span class="p">,</span> <span class="m">0x21</span><span class="p">,</span> <span class="m">0x0A</span><span class="p">}</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above opens the <code>data.bin</code> file in write-only and append mode and creates it if it doesn&#39;t already exist. The code above should return a <code>data.bin</code> file containing the following:</p>
+<div class="highlight"><pre class="highlight shell"><code>Hello, World!
+</code></pre></div>
+<p>Next, let&#39;s explore how to write formatted data to a file section.</p>
+
+<h3 id="writing-formatted-data-to-a-file-in-go">Writing formatted data to a file in Go</h3>
+
+<p>This is one of the most common file-writing tasks when building software applications. For example, if you are building an e-commerce website, you will need to build order confirmation receipts for each buyer, which will contain the details of the user&#39;s order. Here is how you can do this in Go:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">username</span><span class="p">,</span> <span class="n">orderNumber</span> <span class="o">:=</span> <span class="s">"Adams_adebayo"</span><span class="p">,</span> <span class="s">"ORD6543234"</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">username</span> <span class="o">+</span> <span class="n">orderNumber</span> <span class="o">+</span> <span class="s">".pdf"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+    <span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">,</span> <span class="n">item3</span> <span class="o">:=</span> <span class="s">"shoe"</span><span class="p">,</span> <span class="s">"bag"</span><span class="p">,</span> <span class="s">"shirt"</span>
+    <span class="n">price1</span><span class="p">,</span> <span class="n">price2</span><span class="p">,</span> <span class="n">price3</span> <span class="o">:=</span> <span class="m">1000</span><span class="p">,</span> <span class="m">2000</span><span class="p">,</span> <span class="m">3000</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Fprintf</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s">"Username: %s</span><span class="se">\n</span><span class="s">Order Number: %s</span><span class="se">\n</span><span class="s">Item 1: %s</span><span class="se">\n</span><span class="s">Price 1: %d</span><span class="se">\n</span><span class="s">Item 2: %s</span><span class="se">\n</span><span class="s">Price 2: %d</span><span class="se">\n</span><span class="s">Item 3: %s</span><span class="se">\n</span><span class="s">Price 3: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">orderNumber</span><span class="p">,</span> <span class="n">item1</span><span class="p">,</span> <span class="n">price1</span><span class="p">,</span> <span class="n">item2</span><span class="p">,</span> <span class="n">price2</span><span class="p">,</span> <span class="n">item3</span><span class="p">,</span> <span class="n">price3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above defines two variables, <code>username</code> and <code>orderNumber</code>, creates a <code>.pdf</code> based on the variables, checks for errors, and defers the <code>Close</code> function with the <code>defer</code> keyword. It then defines three variables, <code>item1</code>, <code>item2</code>, and <code>item3</code>, formats a message with the <code>fmt</code>&#39;s <code>Fprintf</code> all the variables, and writes it to the <code>.pdf</code> file.</p>
+
+<p>The code above then creates an <code>Adams_adebayoORD6543234.pdf</code> file with the following contents:</p>
+<div class="highlight"><pre class="highlight shell"><code>Username: Adams_adebayo
+Order Number: ORD6543234
+Item 1: shoe
+Price 1: 1000
+Item 2: bag
+Price 2: 2000
+Item 3: shirt
+Price 3: 3000
+
+</code></pre></div>
+<h3 id="writing-to-csv-files-in-go">Writing to <code>.csv</code> files in Go</h3>
+
+<p>With the help of the <code>encoding/csv</code> package, you can write data to <code>.csv</code> files easily with Go. For example, you want to store new users&#39; profile information in a <code>.csv</code> file after they sign up:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"encoding/csv"</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">OpenFile</span><span class="p">(</span><span class="s">"users.csv"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_CREATE</span><span class="p">,</span> <span class="m">0644</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">writer</span> <span class="o">:=</span> <span class="n">csv</span><span class="o">.</span><span class="n">NewWriter</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">defer</span> <span class="n">writer</span><span class="o">.</span><span class="n">Flush</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"Adams Adebayo"</span><span class="p">,</span> <span class="s">"30"</span><span class="p">,</span> <span class="s">"Lagos"</span><span class="p">}</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">writer</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above opens the <code>users.csv</code> file in write-only and append mode and creates it if it doesn&#39;t already exist. It will then use the <code>NewWriter</code> function to create a <code>writer</code> variable, defer the <code>Flush</code> function, create a <code>data</code> variable with the <code>string</code> slice, and write the data to the file with the <code>Write</code> function.</p>
+
+<p>The code above will then return a <code>users.csv</code> file with the following contents:</p>
+<div class="highlight"><pre class="highlight shell"><code>Adams Adebayo,30,Lagos
+</code></pre></div>
+<h3 id="writing-json-data-to-a-file-in-go">Writing JSON data to a file in Go</h3>
+
+<p>Writing JSON data to <code>.json</code> files is a common use case in software development. For example, you are building a small application and want to use a simple <code>.json</code> file to store your application data:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"encoding/json"</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">OpenFile</span><span class="p">(</span><span class="s">"users.json"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_CREATE</span><span class="p">,</span> <span class="m">0644</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">:=</span> <span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="k">interface</span><span class="p">{}{</span>
+        <span class="s">"username"</span><span class="o">:</span> <span class="s">"olodocoder"</span><span class="p">,</span>
+        <span class="s">"twitter"</span><span class="o">:</span>  <span class="s">"@olodocoder"</span><span class="p">,</span>
+        <span class="s">"email"</span><span class="o">:</span>    <span class="s">"hello@olodocoder.com"</span><span class="p">,</span>
+        <span class="s">"website"</span><span class="o">:</span>  <span class="s">"https://dev.to/olodocoder"</span><span class="p">,</span>
+        <span class="s">"location"</span><span class="o">:</span> <span class="s">"Lagos, Nigeria"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">encoder</span> <span class="o">:=</span> <span class="n">json</span><span class="o">.</span><span class="n">NewEncoder</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">Encode</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above opens the <code>users.csv</code> file in write-only and append mode and creates it if it doesn&#39;t already exist, defers the <code>Close</code> function, and defines a <code>data</code> variable containing the user data. It then creates an <code>encoder</code> variable with the <code>NewEncoder</code> function and encodes it with the <code>Encoder</code> function.</p>
+
+<p>The code above then returns a <code>users.json</code> file containing the following:</p>
+<div class="highlight"><pre class="highlight json"><code><span class="p">{</span><span class="nl">"email"</span><span class="p">:</span><span class="s2">"hello@olodocoder.com"</span><span class="p">,</span><span class="nl">"location"</span><span class="p">:</span><span class="s2">"Lagos, Nigeria"</span><span class="p">,</span><span class="nl">"twitter"</span><span class="p">:</span><span class="s2">"@olodocoder"</span><span class="p">,</span><span class="nl">"username"</span><span class="p">:</span><span class="s2">"olodocoder"</span><span class="p">,</span><span class="nl">"website"</span><span class="p">:</span><span class="s2">"https://dev.to/olodocoder"</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<h3 id="writing-xml-data-to-files-in-go">Writing XML data to files in Go</h3>
+
+<p>You can also write XML data to files in Go using the <code>encoding/xml</code> package:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"encoding/xml"</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">type</span> <span class="n">Person</span> <span class="k">struct</span> <span class="p">{</span>
+        <span class="n">Name</span> <span class="kt">string</span> <span class="s">`xml:"name"`</span>
+        <span class="n">Age</span>  <span class="kt">int</span>    <span class="s">`xml:"age"`</span>
+        <span class="n">City</span> <span class="kt">string</span> <span class="s">`xml:"city"`</span>
+    <span class="p">}</span>
+
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">OpenFile</span><span class="p">(</span><span class="s">"users.xml"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_CREATE</span><span class="p">,</span> <span class="m">0644</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">:=</span> <span class="n">Person</span><span class="p">{</span>
+        <span class="n">Name</span><span class="o">:</span> <span class="s">"John Doe"</span><span class="p">,</span>
+        <span class="n">Age</span><span class="o">:</span>  <span class="m">30</span><span class="p">,</span>
+        <span class="n">City</span><span class="o">:</span> <span class="s">"New York"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">encoder</span> <span class="o">:=</span> <span class="n">xml</span><span class="o">.</span><span class="n">NewEncoder</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">Encode</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above defines a <code>Person</code> struct with three fields, opens the <code>users.xml</code> file in write-only and append mode and creates it if it doesn&#39;t already exist, defers the <code>Close</code> function, and defines a <code>data</code> variable that contains the user data. It then creates an <code>encoder</code> variable with the <code>NewEncoder</code> function and encodes it with the <code>Encoder</code> function.</p>
+
+<p>The code above should return a <code>user.xml</code> file that contains the following contents:</p>
+<div class="highlight"><pre class="highlight xml"><code><span class="nt">&lt;Person&gt;&lt;name&gt;</span>John Doe<span class="nt">&lt;/name&gt;&lt;age&gt;</span>30<span class="nt">&lt;/age&gt;&lt;city&gt;</span>New York<span class="nt">&lt;/city&gt;&lt;/Person&gt;</span>
+</code></pre></div>
+<h3 id="renaming-files-in-go">Renaming files in Go</h3>
+
+<p>Go enables you to rename files from your code using the <code>Rename</code> function:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Rename</span><span class="p">(</span><span class="s">"users.xml"</span><span class="p">,</span> <span class="s">"data.xml"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above renames the <code>users.xml</code> file created in the previous section to <code>data.xml</code>.</p>
+
+<h3 id="deleting-files-in-go">Deleting files in Go</h3>
+
+<p>Go enables you to delete files with the <code>Remove</code> function:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Remove</span><span class="p">(</span><span class="s">"data.bin"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"File deleted"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above deletes the <code>data.bin</code> file from the specified path.</p>
+
+<p>Now that you understand how to write and manipulate different types of files in Go, let&#39;s explore how to work with directories.</p>
+
+<h2 id="working-with-directories-in-go">Working with directories in Go</h2>
+
+<p>In addition to files, Go also provides functions that you can use to perform different tasks in applications. We will explore some of these tasks in the following sections.</p>
+
+<h3 id="creating-a-directory">Creating a directory</h3>
+
+<p>Go provides a <code>Mkdir</code> function that you can use to create an empty directory:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Mkdir</span><span class="p">(</span><span class="s">"users"</span><span class="p">,</span> <span class="m">0755</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Directory Created Successfully"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above creates a <code>users</code> folder in the current working directory.</p>
+
+<h3 id="creating-multiple-directories-in-go">Creating multiple directories in Go</h3>
+
+<p>You can create multiple directories in Go using the <code>MkdirAll</code> function:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">MkdirAll</span><span class="p">(</span><span class="s">"data/json_data"</span><span class="p">,</span> <span class="m">0755</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Directory Created Successfully"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above will create a <code>data</code> directory and a <code>json_data</code> directory inside it.</p>
+
+<blockquote>
+<p>Note: If a <code>data</code> directory already exists, the code will only add a <code>json_data</code> directory inside it.</p>
+</blockquote>
+
+<h3 id="checking-if-a-directory-exists-in-go">Checking if a directory exists in Go</h3>
+
+<p>To avoid errors, checking if a directory exists before creating a file or directory inside is good practice. You can use the <code>Stat</code> function and the <code>IsNotExist</code> function to do a quick check:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Stat</span><span class="p">(</span><span class="s">"data/csv_data"</span><span class="p">);</span> <span class="n">os</span><span class="o">.</span><span class="n">IsNotExist</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Directory does not exist"</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Directory exists"</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above returns a message based on the results of the check. In my case, it will return the following:</p>
+<div class="highlight"><pre class="highlight shell"><code>Directory exists
+</code></pre></div>
+<h3 id="renaming-directories-in-go">Renaming directories in Go</h3>
+
+<p>You can also use the <code>Rename</code> function to rename directories:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Rename</span><span class="p">(</span><span class="s">"data/csv_data"</span><span class="p">,</span> <span class="s">"data/xml_data"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above renames the <code>data/csv_data</code> directory to <code>data/xml_data</code>.</p>
+
+<h3 id="deleting-an-empty-directory-in-go">Deleting an empty directory in Go</h3>
+
+<p>You can use the <code>Remove</code> function to delete folders in your applications:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Remove</span><span class="p">(</span><span class="s">"data/json_data"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>The code above removes the <code>json_data</code> directory from the <code>data</code> directory.</p>
+
+<h3 id="deleting-a-directory-with-all-its-content-in-go">Deleting a directory with all its content in Go</h3>
+
+<p>Go provides a <code>RemoveAll</code> function that allows you to remove all the directories and everything inside them, including files and folders:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">RemoveAll</span><span class="p">(</span><span class="s">"users"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"users directory and all it's content has been removed"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above deletes the <code>users</code> directory and everything inside it.</p>
+
+<blockquote>
+<p>Note: It&#39;s good practice to check if the directory exists before attempting to delete it.</p>
+</blockquote>
+
+<h3 id="get-a-list-of-files-and-directories-in-a-directory-in-go">Get a list of files and directories in a directory in Go</h3>
+
+<p>You can retrieve a list of all the files and directories in a directory using the <code>ReadDir</code> function:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">dirEntries</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">ReadDir</span><span class="p">(</span><span class="s">"data"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">entry</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">dirEntries</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">Name</span><span class="p">())</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above returns a list of all the directories and files inside the <code>data</code> folder.</p>
+
+<p>Now that you know how to work with directories in Go applications, let&#39;s explore some of the advanced file operations in the next section.</p>
+
+<h2 id="advanced-file-operations-in-go">Advanced file operations in Go</h2>
+
+<p>In this section, we will explore some of the advanced file operations you might encounter in Go applications.</p>
+
+<h3 id="writing-compressed-data-to-a-file-in-go">Writing compressed data to a file in Go</h3>
+
+<p>Working with compressed files is uncommon, but here&#39;s how to create a <code>.txt</code> file inside a compressed file using the <code>compress/gzip</code> package:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"compress/gzip"</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">OpenFile</span><span class="p">(</span><span class="s">"data.txt.gz"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_CREATE</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span><span class="o">|</span><span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="p">,</span> <span class="m">0666</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">gzipWriter</span> <span class="o">:=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">NewWriter</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">defer</span> <span class="n">gzipWriter</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">:=</span> <span class="s">"Data to compress"</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">gzipWriter</span><span class="o">.</span><span class="n">Write</span><span class="p">([]</span><span class="kt">byte</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"File compressed successfully"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above creates a <code>data.txt.gz</code>, which contains a <code>data.txt</code> file in the working directory.</p>
+
+<h3 id="writing-encrypted-data-to-a-file-in-go">Writing encrypted data to a file in Go</h3>
+
+<p>When building applications that require secure files, you can create an encrypted file with Go&#39;s <code>crypto/aes</code> and <code>crypto/cipher</code> packages:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"crypto/aes"</span>
+    <span class="s">"crypto/cipher"</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"log"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c">// file, err := os.OpenFile("encrypted.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)</span>
+    <span class="n">file</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">"encrypted.txt"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Error"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">file</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">key</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">(</span><span class="s">"cacf2ebb8cf3402964356547f20cced5"</span><span class="p">)</span>
+    <span class="n">plaintext</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">(</span><span class="s">"This is a secret! Don't tell anyone!🤫"</span><span class="p">)</span>
+
+    <span class="n">block</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">aes</span><span class="o">.</span><span class="n">NewCipher</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Error"</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">ciphertext</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">plaintext</span><span class="p">))</span>
+    <span class="n">stream</span> <span class="o">:=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">NewCTR</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="n">aes</span><span class="o">.</span><span class="n">BlockSize</span><span class="p">))</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">XORKeyStream</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Error"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Encrypted file created successfully"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above creates an <code>encrypted.txt</code> file containing an encrypted version of the <code>plaintext</code> string:</p>
+<div class="highlight"><pre class="highlight plaintext"><code>?Э_g?L_.?^_?,_?_;?S???{?Lؚ?W4r
+W?8~?
+</code></pre></div>
+<h3 id="copying-a-file-to-another-directory-in-go">Copying a file to another directory in Go</h3>
+
+<p>Copying existing files to different locations is something we all do frequently. Here&#39;s how to do it in Go:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"io"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">srcFile</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="s">"data/json.go"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">srcFile</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">destFile</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">"./json.go"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">defer</span> <span class="n">destFile</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">Copy</span><span class="p">(</span><span class="n">destFile</span><span class="p">,</span> <span class="n">srcFile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Copy done!"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above copies the <code>json.go</code> file in the <code>data</code> directory and its contents and then creates another <code>json.go</code> with the same in the root directory.</p>
+
+<h3 id="get-file-properties-in-go">Get file properties in Go</h3>
+
+<p>Go allows you to get the properties of a file with the <code>Stat</code> function:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">fileInfo</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Stat</span><span class="p">(</span><span class="s">"config.json"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"File name:"</span><span class="p">,</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">Name</span><span class="p">())</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Size in bytes:"</span><span class="p">,</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">Size</span><span class="p">())</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Permissions:"</span><span class="p">,</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">Mode</span><span class="p">())</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Last modified:"</span><span class="p">,</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">ModTime</span><span class="p">())</span>
+
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"File properties retrieved successfully"</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre></div>
+<p>The code above returns the name, size, permissions, and last modified date of the <code>config.json</code> file:</p>
+<div class="highlight"><pre class="highlight shell"><code>File name: config.json
+Size <span class="k">in </span>bytes: 237
+Permissions: <span class="nt">-rw-r--r--</span>
+Last modified: 2023-07-11 22:46:59.705875417 +0100 WAT
+File properties retrieved successfully
+</code></pre></div>
+<h3 id="get-the-current-working-directory-path-in-go">Get the current working directory path in Go</h3>
+
+<p>You can get the current working directory of your application in Go:</p>
+<div class="highlight"><pre class="highlight go"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"os"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">wd</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">Getwd</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Current working directory:"</span><span class="p">,</span> <span class="n">wd</span><span class="p">)</span>
+
+<span class="p">}</span>
+</code></pre></div>
+<p>The code above will return the full path of my current working directory:</p>
+<div class="highlight"><pre class="highlight shell"><code>Current working directory: /Users/user12/Documents/gos/go-files
+</code></pre></div>
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That&#39;s it! You now have the knowledge to tackle most of the file operations you&#39;ll encounter when building Go applications. In this article, we explored how to read, write and manipulate files and directories in Go.</p>
+
+<p>We also explored how to solve many file operations problems by combining different Go packages and functions. Thank you so much for reading! If you have any questions, suggestions, or corrections, feel free to connect with me on <a href="https://twitter.com/olodocoder">Twitter</a> and <a href="https://www.linkedin.com/in/adams-adebayo">LinkedIn</a>, and I&#39;ll try my best to work on them.</p>
+
+          </article>
+
+            <form action="https://app.convertkit.com/forms/3715689/subscriptions" class="seva-form formkit-form" style="" method="post" data-sv-form="3715689" data-uid="335001472e" data-format="inline" data-version="5" data-options="{&quot;settings&quot;:{&quot;after_subscribe&quot;:{&quot;action&quot;:&quot;redirect&quot;,&quot;success_message&quot;:&quot;Success! Now check your email to confirm your subscription.&quot;,&quot;redirect_url&quot;:&quot;https://www.honeybadger.io/leveling-up-confirmation/?source=blog&quot;},&quot;modal&quot;:{&quot;trigger&quot;:null,&quot;scroll_percentage&quot;:null,&quot;timer&quot;:null,&quot;devices&quot;:null,&quot;show_once_every&quot;:null},&quot;recaptcha&quot;:{&quot;enabled&quot;:false},&quot;return_visitor&quot;:{&quot;action&quot;:&quot;hide&quot;,&quot;custom_content&quot;:&quot;&quot;},&quot;slide_in&quot;:{&quot;display_in&quot;:null,&quot;trigger&quot;:null,&quot;scroll_percentage&quot;:null,&quot;timer&quot;:null,&quot;devices&quot;:null,&quot;show_once_every&quot;:null}}}" min-width="400 500 600 700 800">
+              <div class="fs-4">
+                <h2>Get the Honeybadger newsletter</h2>
+                <div class="fs-5 rmb-3">
+                  Each month we share news, best practices, and stories from the DevOps &amp; monitoring community—exclusively for developers like you.
+                </div>
+                <div class="fs-6" data-style="clean">
+                  <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
+                  <div data-element="fields" data-stacked="false" class="seva-fields formkit-fields row gx-3 gy-2 align-items-end">
+                    <div class="" style="max-width:50%;">
+                      <input class="formkit-input form-control mb-1 me-1" aria-label="Your first name" name="fields[first_name]" placeholder="Your first name" type="text">
+                      <input class="formkit-input form-control mb-1 me-1" name="email_address" placeholder="Your email address" required="" type="email">
+                    </div>
+                    <div class="">
+                      <button data-element="submit" class="formkit-submit formkit-submit btn btn-primary mb-1">
+                        <div class="formkit-spinner">
+                          <div></div>
+                          <div></div>
+                          <div></div>
+                        </div>
+                        <span>Sign up</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <input type="hidden" name="tags[]" value="3123765">
+              </div>
+            </form>
+        </div>
+
+          <div class="d-flex flex-column flex-sm-row gap-2 gap-md-3 gap-xl-4 c-blog-author" id="authorDetails">
+            <div>
+                <img src="https://www-files.honeybadger.io/authors/adebayoadams.png" class="avatar" alt="author photo">
+            </div>
+
+            <div>
+              <div class="h4">Adebayo Adams</div>
+              <p>Being a self taught developer himself, Adams understands that consistent learning and doing is the way to become self sufficient as a software developer. He loves learning new things and firmly believes that learning never stops.</p>
+
+              <ul class="list-inline mt-n2">
+                  <li class="list-inline-item mt-2">
+                    <a href="https://x.com/olodocoder" title="Twitter" rel="noopener nofollow" class="link-underline link-underline-opacity-0" target="_blank">
+                      <i class="fab fa-twitter me-1" aria-hidden="true"></i>X/Twitter
+                      <span class="a11y-text">Author Twitter</span>
+                    </a>
+                  </li>
+                  <li class="list-inline-item mt-2">
+                    <a href="https://ng.linkedin.com/in/adams-adebayo" title="Mastodon" rel="noopener nofollow" class="link-underline link-underline-opacity-0" target="_blank">
+                      <i class="fab fa-linkedin me-1" aria-hidden="true"></i>LinkedIn
+                      <span class="a11y-text">Author LinkedIn</span>
+                    </a>
+                  </li>
+                  <li class="list-inline-item mt-2">
+                    <a target="_blank" class="link-underline link-underline-opacity-0" rel="noopener nofollow" href="https://dev.to/olodocoder">
+                      <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                      Author's Website
+                    </a>
+                  </li>
+              </ul>
+                <a href="/blog/authors/adebayoadams/">More articles by Adebayo Adams</a>
+            </div>
+          </div>
+
+          <section id="more-articles">
+            <h2 class="mb-4">More articles</h2>
+            <ul class="list-unstyled">
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Feb 28, 2025</span>
+                  <a href="/blog/rubyist-learn-go/">Comparing Go vs Ruby</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Apr 02, 2024</span>
+                  <a href="/blog/go-and-gin-api/">How to build an API with Go and Gin</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Oct 30, 2023</span>
+                  <a href="/blog/a-definitive-guide-to-regular-expressions-in-go/">Mastering regular expressions in Go</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Oct 05, 2023</span>
+                  <a href="/blog/how-to-create-crud-application-with-golang-and-mysql/">Creating a CRUD application with Golang and MySQL</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Aug 17, 2023</span>
+                  <a href="/blog/complete-guide-to-dates-and-times-in-go/">The complete guide to dates and times in Go</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Jul 27, 2023</span>
+                  <a href="/blog/a-step-by-step-guide-to-creating-production-ready-apis-in-go-with-gin-and-gorm/">A step-by-step guide to creating production-ready APIs in Go with Gin and Gorm</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Jun 15, 2023</span>
+                  <a href="/blog/migrate-from-python-golang/">A comprehensive guide on how to migrate from Python to Go</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Mar 30, 2023</span>
+                  <a href="/blog/go-exception-handling/">Error handling in Go: defer, panic, and recover</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Dec 22, 2020</span>
+                  <a href="/blog/ruby-to-go-5/">An Introduction to Go Tooling</a>
+                </li>
+                <li class="mb-1">
+                  <span class="d-none d-sm-inline-block" style="width: 130px;">Sep 08, 2020</span>
+                  <a href="/blog/go-web-services/">A Gentle Introduction to Web Services With Go</a>
+                </li>
+            </ul>
+          </section>
+
+      </div>
+
+
+
+      <div class="col-lg-4">
+
+
+        <div class="c-very-special-messages c-very-special-messages-inlineable">
+                <div class="c-very-special-messages__item rounded">
+                  <a href="/">
+                    <img src="https://www-files.honeybadger.io/pages/blog/2025-move-fast-fix-things-1920x1080.png?width=1000" class="img-fluid rounded" alt="An advertisement for Honeybadger that reads 'Move fast and fix things.'">
+                  </a>
+                  <div class="mt-4">
+                    <p><em>"We love Honeybadger. Not only is it a fab tool and very affordable, they feel like a partner - whenever we needed help we got FIRST CLASS service."</em></p>
+                    <p>Fix errors, eliminate performance bottlenecks, and dig into the details faster than ever before. With support for Ruby, Elixir, and 8 other languages, <strong>Honeybadger is the best way to gain real-time insights into your application’s health and performance.</strong></p>
+                  </div>
+
+                  <div class="rmt-4">
+                    <a href="https://app.honeybadger.io/users/sign_up?plan=team" onclick="window.fathom.trackEvent('Get started for free');" class="btn btn-lg btn-primary fw-bold d-block m-auto" style="max-width: 25rem;">Get started for free</a>
+                    <div class="text-center mt-1">
+                      <small>Simple 5-minute setup — No credit card required</small>
+                    </div>
+                  </div>
+                </div>
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <div class="footer pb-5" data-bs-theme="dark">
+  <div class="container">
+    <div class="row d-flex flex-row justify-content-center">
+      <div class="rmt-5 col-md-1" style="margin-right: 0; padding-right: 0; margin-left: 0; padding-left: 0;">
+        <center><img src="/images/bolt.svg?1749260165" class="img-fluid" style="max-width: 60px;" alt="Honeybadger's logo: a lightening bolt inside of a diamond shape."></center>
+      </div>
+      <div class="col-md-11 row">
+        <div class="col-md-3 col-6 rmt-5">
+          <div class="footer__heading">Product</div>
+          <nav class="footer__nav">
+            <ul>
+              <li>
+                <a href="/tour/error-tracking/">Error Tracking</a>
+              </li>
+              <li>
+                <a href="/tour/uptime-monitoring/">Uptime Monitoring</a>
+              </li>
+              <li>
+                <a href="/tour/status-pages/">Status Pages</a>
+              </li>
+              <li>
+                <a href="/tour/logging-observability/">Logging &amp; Observability</a>
+              </li>
+              <li>
+                <a href="/tour/cron-job-heartbeat-monitoring/">Cron &amp; Heartbeat Monitoring</a>
+              </li>
+              <li>
+                <a href="/integrations/">Integrations</a>
+              </li>
+              <li>
+                <a href="/plans/">Plans &amp; pricing</a>
+              </li>
+              <li>
+                <a href="/changelog/">Changelog</a>
+              </li>
+              <li>
+                <a href="/security/">Security &amp; Privacy</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="col-md-3 col-6 rmt-5">
+          <div class="footer__heading">Stacks</div>
+          <div class="row">
+            <div class="col-lg-5 col-12">
+              <nav class="footer__nav">
+                <ul>
+                  <li>
+                    <a href="/for/rails/">Rails</a>
+                  </li>
+                  <li>
+                    <a href="/for/laravel/">Laravel</a>
+                  </li>
+                  <li>
+                    <a href="/for/django/">Django</a>
+                  </li>
+                  <li>
+                    <a href="/for/phoenix/">Phoenix</a>
+                  </li>
+                  <li>
+                    <a href="/for/javascript/">JavaScript</a>
+                  </li>
+                  <li>
+                    <a href="/for/ruby/">Ruby</a>
+                  </li>
+                  <li>
+                    <a href="/for/node/">Node</a>
+                  </li>
+                  <li>
+                    <a href="/for/python/">Python</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            <div class="col-lg-5 col-12">
+              <nav class="footer__nav">
+                <ul>
+                  <li>
+                    <a href="/for/php/">PHP</a>
+                  </li>
+                  <li>
+                    <a href="/for/elixir/">Elixir</a>
+                  </li>
+                  <li>
+                    <a href="/for/dotnet/">.NET/C#</a>
+                  </li>
+                  <li>
+                    <a href="/for/crystal/">Crystal</a>
+                  </li>
+                  <li>
+                    <a href="/for/go/">Go <span class="visually-hidden">programming language</span></a>
+                  </li>
+                  <li>
+                    <a href="/for/java/">Java</a>
+                  </li>
+                  <li>
+                    <a href="/for/cocoa/">Cocoa</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6 rmt-5">
+          <div class="footer__heading">Company</div>
+          <nav class="footer__nav">
+            <ul>
+              <li>
+                <a href="/about/">Meet the 'Badgers</a>
+              </li>
+              <li>
+                <a href="/careers/">Job openings</a>
+              </li>
+              <li>
+                <a href="/assets/">Brand assets</a>
+              </li>
+              <li>
+                <a href="/terms/">Terms of use</a>
+              </li>
+              <li>
+                <a href="/privacy/">Privacy statement</a>
+              </li>
+              <li>
+                <a href="/contact/">Contact us</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="col-md-2 col-6 rmt-5">
+          <div class="footer__heading">Resources</div>
+          <nav class="footer__nav">
+            <ul>
+              <li>
+                <a href="https://docs.honeybadger.io/">Developer docs</a>
+              </li>
+              <li>
+                <a href="https://www.honeybadger.io/blog/">Developer blog</a>
+              </li>
+              <li>
+                <a href="/newsletter/">Newsletter</a>
+              </li>
+              <li>
+                <a href="https://www.exceptionalcreatures.com/">Exceptional Creatures</a>
+              </li>
+              <li>
+                <a href="https://www.founderquestpodcast.com">FounderQuest</a>
+              </li>
+              <li class="d-flex gap-2">
+                <a href="https://bsky.app/profile/honeybadger.io"><i class="fab fa-bluesky" aria-hidden="true"></i></a>
+                <a href="https://honeybadger.social/@honeybadger"><i class="fab fa-mastodon" aria-hidden="true"></i></a>
+                <a href="https://www.linkedin.com/company/honeybadger-io"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="col-12 rmt-5">
+          <div class="footer__heading">Switching to Honeybadger</div>
+          <nav class="footer__nav">
+            <ul>
+                <li><a href="/vs/sentry/">Alternative to Sentry</a></li>
+                <li><a href="/vs/rollbar/">Alternative to Rollbar</a></li>
+                <li><a href="/vs/bugsnag/">Alternative to BugSnag</a></li>
+                <li><a href="/vs/airbrake/">Alternative to Airbrake</a></li>
+              <li><a href="/vs/">See all comparisons</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    </div>
+
+
+    <!-- ConvertKit -->
+    <script rel="preconnect" defer src="https://f.convertkit.com/ckjs/ck.5.js"></script>
+
+    <!-- Fathom -->
+    <script rel="preconnect" defer src="https://cdn.usefathom.com/script.js" data-site="HVGCVOJS"></script>
+
+
+    <script src="/assets/main-CTgD-7vZ.js?1749260165"></script>
+
+  </body>
+</html>
