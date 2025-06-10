@@ -1,4 +1,4 @@
-# pocket-obsidian
+# pocket-obsidian <!-- omit from toc -->
 Convert pocket CSV's into obsidian clippings markdown files
 
 [Mozilla Pocket is EOL'd](https://support.mozilla.org/en-US/kb/future-of-pocket). Which is not ideal. 
@@ -11,9 +11,23 @@ I liked this article about moving from Mozilla Pocket to [Obsidian](https://obsi
 
 So I decided to give it a whirl. Follow the instructions it's really straighforward. 
 However, there is no direct way to convert this CSV into Obsidian, so I wrote one. 
+Feedback gladly received. 
 
+- [Download a release](#download-a-release)
+- [To build from source](#to-build-from-source)
+- [Usage](#usage)
+  
+
+# Download a release
+
+You can get releases from the releases page [Releases](https://github.com/fergalsomers/pocket-obsidian/releases)
+
+- Download the one most appropriate for your system
+- if you are on a Mac you will need to use Security Manager to let it 
 
 # To build from source
+
+Alternatively, just build from source. 
 
 Pre-requiisite have Golang installed (e.g. https://go.dev/doc/install or  `brew install go`)
 
@@ -24,7 +38,7 @@ go test ./...
 go build . 
 ```
 
-# To run
+# Usage
 
 ```
 ./pocket-obsidian [CSV file]
