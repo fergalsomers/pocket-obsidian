@@ -109,6 +109,7 @@ func main() {
 	log.Printf("Number of processors: %d", numWorkers)
 
 	// Start some workers to process the results
+	c := page.NewContentRetriever()
 	for i := 0; i < numWorkers; i++ {
 		go func() {
 			for {
@@ -116,7 +117,7 @@ func main() {
 				if !ok {
 					return
 				}
-				_, err := page.RecordToClipping(outputDir, record, markRead, clippingTags)
+				_, err := page.RecordToClipping(c, outputDir, record, markRead, clippingTags)
 				results <- Result{Record: record, Err: err}
 			}
 		}()

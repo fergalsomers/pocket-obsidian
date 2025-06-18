@@ -33,9 +33,7 @@ Pre-requiisite have Golang installed (e.g. https://go.dev/doc/install or  `brew 
 
 ```
 git clone https://github.com/fergalsomers/pocket-obsidian.git
-cd pocket-obsidian
-go test ./...
-go build . 
+make
 ```
 
 # Usage

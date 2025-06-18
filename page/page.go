@@ -64,42 +64,6 @@ func RecordToPage(record []string, markRead bool, mandatoryTags []string) (*Page
 	return &page, nil
 }
 
-func (p *Page) GetHTML() ([]byte, string, error) {
-	return GetHTML(p.Url)
-}
-
-func GetHTML(url string) ([]byte, string, error) {
-	// Attempt to retrieve the HTML content
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
-	resp, err := client.Get(url)
-
-	if err != nil {
-		// handle error (could be timeout)
-		return nil, "", fmt.Errorf("error fetching URL %s: %w", url, err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		return nil, "", fmt.Errorf("error retrieving URL code: %d, %s", resp.StatusCode, url)
-	}
-
-	contentType := resp.Header.Get("content-type")
-	if !strings.HasPrefix(contentType, "text/html") {
-		// this is not HTML - don't bother downloading.
-		return nil, contentType, nil
-	}
-
-	content, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, contentType, fmt.Errorf("error parsing content from URL %s: %w", url, err)
-	}
-
-	return content, contentType, nil
-}
-
 func ToMarkdown(input []byte) ([]byte, error) {
 	// Convert HTML to Markdown
 	return htmltomarkdown.ConvertReader(bytes.NewReader(input))
@@ -254,8 +218,51 @@ func (a *Article) IsFull() bool {
 	return a.Description != "" && a.Published != "" && a.Authors != nil
 }
 
-func ExtractArticleFromContent(url string) (*Article, error) {
-	content, _, err := GetHTML(url)
+// HTTPGetter is an interface that defines a method to get HTTP responses.
+type ContentRetriever interface {
+	Get(url string) ([]byte, string, error)
+}
+
+type httpContnetRetriever struct {
+	client *http.Client
+}
+
+func (h *httpContnetRetriever) Get(url string) ([]byte, string, error) {
+	// Create a new HTTP request
+	resp, err := h.client.Get(url)
+	if err != nil {
+		return nil, "", fmt.Errorf("error fetching URL %s: %w", url, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", fmt.Errorf("error retrieving URL code: %d, %s", resp.StatusCode, url)
+	}
+
+	contentType := resp.Header.Get("content-type")
+	if !strings.HasPrefix(contentType, "text/html") {
+		// this is not HTML - don't bother downloading.
+		return nil, contentType, nil
+	}
+
+	content, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, contentType, fmt.Errorf("error parsing content from URL %s: %w", url, err)
+	}
+
+	return content, contentType, nil
+}
+
+func NewContentRetriever() ContentRetriever {
+	return &httpContnetRetriever{
+		client: &http.Client{
+			Timeout: 10 * time.Second,
+		},
+	}
+}
+
+func ExtractArticleFromContent(c ContentRetriever, url string) (*Article, error) {
+	content, _, err := c.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +329,7 @@ func getArticleMetadataFromReader(r io.Reader, url string) (*Article, error) {
 	return getArticleMetadataFromNode(node, url)
 }
 
-func CleanFilename(s string) string {
+func cleanFilename(s string) string {
 	s1, err := filenamify.Filenamify(s, filenamify.Options{})
 	if err == nil {
 		return s1
@@ -335,14 +342,14 @@ func CleanFilename(s string) string {
 // Convert a CSV record to a Clippping and write it to the outputDir
 // Also uses the clipping to create (cleaned) filename
 // Pocket does not always get titles correct and processing can generate a better title.
-func RecordToClipping(outputDir string, record []string, markRead bool, clippingTags []string) (*Clipping, error) {
+func RecordToClipping(r ContentRetriever, outputDir string, record []string, markRead bool, clippingTags []string) (*Clipping, error) {
 	p, err := RecordToPage(record, markRead, clippingTags)
 	if err != nil {
 		log.Fatalf("Error converting record to page: %v", err)
 	}
 
 	c := NewClipping(p, nil)
-	article, err := ExtractArticleFromContent(c.Metadata.Source)
+	article, err := ExtractArticleFromContent(r, c.Metadata.Source)
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve page %v", err)
 	} else {
@@ -351,7 +358,7 @@ func RecordToClipping(outputDir string, record []string, markRead bool, clipping
 		}
 	}
 
-	outputFile := filepath.Join(outputDir, CleanFilename(fmt.Sprintf("%s.md", c.Metadata.Title)))
+	outputFile := filepath.Join(outputDir, cleanFilename(fmt.Sprintf("%s.md", c.Metadata.Title)))
 	file, err := os.Create(outputFile)
 	if err != nil {
 		return nil, fmt.Errorf("error creating file %s: %v", outputFile, err)

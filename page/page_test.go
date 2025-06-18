@@ -3,7 +3,9 @@ package page
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,11 +13,33 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	_ "embed"
 )
+
+//go:embed testdata/meta_html.html
+var sampleHTTML []byte
 
 func TestPage(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "testcsv suite")
+}
+
+type testContentDownloader struct {
+	returnCodes map[string][]byte
+}
+
+func (t *testContentDownloader) Get(url string) ([]byte, string, error) {
+	if t.returnCodes == nil {
+		return nil, "", fmt.Errorf("%d : Not Found", http.StatusNotFound)
+	}
+
+	content := t.returnCodes[url]
+	if content == nil {
+		return nil, "", fmt.Errorf("%d : Not Found", http.StatusNotFound)
+	}
+
+	return content, "text/html", nil
 }
 
 var _ = Describe("PageTest", Ordered, func() {
@@ -243,13 +267,44 @@ This is a test paragraph.
 
 	It("Should clean filenames", func() {
 		orig := "akka/stream-design.rst at wip-stream-design-docs · akka/akka · GitHub"
-		s := CleanFilename(orig)
+		s := cleanFilename(orig)
 		Expect(s).NotTo(Equal(orig))
 	})
 
-	It("Should determine content", func() {
+	It("Should test retrieve content from non- existent URL", func() {
 		newstack := "https://thenewstack.io/why-kubernetes-needs-to-be-dumbed-down-for-devops/"
-		content, _, err := GetHTML(newstack)
+		r := &testContentDownloader{
+			returnCodes: nil,
+		}
+
+		nonExistingURL := "http://nowhere.com"
+		content, meta, err := r.Get(nonExistingURL)
+		Expect(err).To(Not(BeNil()))
+		Expect(meta).To((BeEmpty()), "Expected meta to be nil for non-existing URL")
+		Expect(content).To(BeNil(), "Expected content to be nil for non-existing URL")
+
+		r = &testContentDownloader{
+			returnCodes: map[string][]byte{
+				newstack: sampleHTTML,
+			},
+		}
+
+		content, meta, err = r.Get(nonExistingURL)
+		Expect(err).To(Not(BeNil()))
+		Expect(meta).To((BeEmpty()), "Expected meta to be nil for non-existing URL")
+		Expect(content).To(BeNil(), "Expected content to be nil for non-existing URL")
+	})
+
+	It("Should retrieve content from URL", func() {
+
+		newstack := "https://thenewstack.io/why-kubernetes-needs-to-be-dumbed-down-for-devops/"
+		r := &testContentDownloader{
+			returnCodes: map[string][]byte{
+				newstack: sampleHTTML,
+			},
+		}
+
+		content, _, err := r.Get(newstack)
 		Expect(err).To(BeNil())
 		article, err := getArticleMetadataFromReader(bytes.NewReader(content), newstack)
 		Expect(err).To(BeNil())
@@ -258,4 +313,20 @@ This is a test paragraph.
 		c.Decorate(article)
 		Expect(c.MarkdownContent).NotTo(BeNil())
 	})
+
+	It("Should extract content from a testDownlaoder", func() {
+		newstack := "https://thenewstack.io/why-kubernetes-needs-to-be-dumbed-down-for-devops/"
+		r := &testContentDownloader{
+			returnCodes: map[string][]byte{
+				newstack: sampleHTTML,
+			},
+		}
+		article, error := ExtractArticleFromContent(r, newstack)
+		log.Printf("Title %s", article.Title)
+		log.Printf("%v", article)
+		Expect(error).To(BeNil(), "Failed to extract article from content")
+		Expect(article).NotTo(BeNil(), "Expected article to be not nil")
+		Expect(article.Title).To(Equal("Using Istio Traffic Management on Amazon EKS to Enhance User Experience | Amazon Web Services"), "Expected article title to match")
+	})
+
 })
